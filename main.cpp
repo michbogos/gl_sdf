@@ -24,8 +24,9 @@ static void MainLoopForEmscripten()     { MainLoopForEmscriptenP(); }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
+
 
 int main(int, char**)
 {
@@ -100,6 +101,7 @@ int main(int, char**)
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     Shader metaballShader("metaball_shader.vs", "metaball_shader.fs");
+    Shader metaballShader3d("metaball_shader_3d.vs", "metaball_shader_3d.fs");
 
     float speed = 1.0f;
     float s1 = 0.2f;
@@ -107,6 +109,7 @@ int main(int, char**)
     float s3 = 0.2f;
     float s4 = 0.2f;
     float distortion = 1.0f;
+    bool use3d = false;
 
     #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -119,14 +122,21 @@ int main(int, char**)
     {
         processInput(window);
 
-        metaballShader.use();
-        metaballShader.setFloat("time", glfwGetTime());
-        metaballShader.setFloat("speed", speed);
-        metaballShader.setFloat("s1", s1);
-        metaballShader.setFloat("s2", s2);
-        metaballShader.setFloat("s3", s3);
-        metaballShader.setFloat("s4", s4);
-        metaballShader.setFloat("distortion", distortion);
+        if(!use3d){
+            metaballShader.use();
+            metaballShader.setFloat("time", glfwGetTime());
+            metaballShader.setFloat("speed", speed);
+            metaballShader.setFloat("s1", s1);
+            metaballShader.setFloat("s2", s2);
+            metaballShader.setFloat("s3", s3);
+            metaballShader.setFloat("s4", s4);
+            metaballShader.setFloat("distortion", distortion);
+            metaballShader.setFloat("aspectRatio", (float)SCR_HEIGHT/(float)SCR_WIDTH);
+        }
+        else{
+            metaballShader3d.use();
+            metaballShader3d.setFloat("aspectRatio", (float)SCR_HEIGHT/(float)SCR_WIDTH);
+        }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -142,6 +152,7 @@ int main(int, char**)
         ImGui::Begin("Settings");
 
         //ImGui::SliderFloat("speed", &speed, -10.0f, 10.0f);
+        ImGui::Checkbox("3d", &use3d);
         ImGui::SliderFloat("s1", &s1, 0.0f, 1.0f);
         ImGui::SliderFloat("s2", &s2, 0.0f, 1.0f);
         ImGui::SliderFloat("s3", &s3, 0.0f, 1.0f);
@@ -179,4 +190,6 @@ void processInput(GLFWwindow *window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    SCR_HEIGHT = height;
+    SCR_WIDTH = width;
 }

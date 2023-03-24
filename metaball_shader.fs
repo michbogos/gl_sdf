@@ -9,6 +9,7 @@ uniform float s2;
 uniform float s3;
 uniform float s4;
 uniform float distortion;
+uniform float aspectRatio;
 
 // complex number operations
 vec2 cadd( vec2 a, float s ) { return vec2( a.x+s, a.y ); }
@@ -86,7 +87,7 @@ float displacement(in vec2 point){
 
 void main()
 {
-    if(opSmoothUnion(sdf(ourColor.xy)+displacement(ourColor.xy), calc(ourColor.xy, 0), 0.1) > 0.0){
+    if(opSmoothUnion(sdf(vec2(ourColor.x/aspectRatio, ourColor.y))+displacement(vec2(ourColor.x/aspectRatio, ourColor.y)), calc(vec2(ourColor.x/aspectRatio, ourColor.y), 0), 0.1) > 0.0){
         FragColor = vec3(0.0, 0.0, 0.0);
     }
     else{
