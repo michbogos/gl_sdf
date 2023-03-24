@@ -136,6 +136,7 @@ int main(int, char**)
         else{
             metaballShader3d.use();
             metaballShader3d.setFloat("aspectRatio", (float)SCR_HEIGHT/(float)SCR_WIDTH);
+            metaballShader3d.setFloat("time", glfwGetTime());
         }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
