@@ -14,7 +14,7 @@
 #CXX = g++
 #CXX = clang++
 
-EXE = example_glfw_opengl3
+EXE = gl_sdf
 IMGUI_DIR = ../..
 SOURCES = main.cpp
 SOURCES += glad.c shader.cpp
