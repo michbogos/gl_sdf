@@ -11,20 +11,20 @@
 #   pacman -S --noconfirm --needed mingw-w64-x86_64-toolchain mingw-w64-x86_64-glfw
 #
 
-#CXX = g++
+CXX = g++
 #CXX = clang++
 
 EXE = gl_sdf
-IMGUI_DIR = ../..
+IMGUI_DIR = ./
 SOURCES = main.cpp
-SOURCES += glad.c shader.cpp
+SOURCES += glad.c shader.cpp crude_json.cpp imgui_canvas.cpp imgui_node_editor.cpp imgui_node_editor_api.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I ./
+CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I./backends -fpermissive
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 
