@@ -9,8 +9,6 @@
 #include"imgui_impl_glfw.h"
 #include"imgui_impl_opengl3.h"
 
-#include"imgui_node_editor.h"
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <functional>
@@ -64,12 +62,6 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
-
-    //Node Editor setup
-    namespace ed = ax::NodeEditor;
-    ed::Config config;
-    config.SettingsFile = "settings.json";
-    ed::EditorContext* m_Context = ed::CreateEditor(&config);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -172,25 +164,6 @@ int main(int, char**)
 
         ImGui::End();
 
-        if(showEditor){
-            ed::SetCurrentEditor(m_Context);
-            ed::Begin("My Editor", ImVec2(0.0, 0.0f));
-            int uniqueId = 1;
-            // Start drawing nodes.
-            ed::BeginNode(uniqueId++);
-                ImGui::Text("Node A");
-                ed::BeginPin(uniqueId++, ed::PinKind::Input);
-                    ImGui::Text("-> In");
-                ed::EndPin();
-                ImGui::SameLine();
-                ed::BeginPin(uniqueId++, ed::PinKind::Output);
-                    ImGui::Text("Out ->");
-                ed::EndPin();
-            ed::EndNode();
-            ed::End();
-            ed::SetCurrentEditor(nullptr);
-        }
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -204,7 +177,6 @@ int main(int, char**)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    ed::DestroyEditor(m_Context);
 
     glfwTerminate();
     return 0;
