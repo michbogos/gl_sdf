@@ -41,6 +41,8 @@ Index of this file:
 
 */
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #pragma once
 #ifndef IMGUI_DISABLE
 

@@ -9,6 +9,8 @@
 #include"imgui_impl_glfw.h"
 #include"imgui_impl_opengl3.h"
 
+#include"imgui_node_editor.h"
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <functional>
@@ -63,6 +65,12 @@ int main(int, char**)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
+    //Node Editor setup
+    namespace ed = ax::NodeEditor;
+    ed::Config config;
+    config.SettingsFile = "settings.json";
+    ed::EditorContext* m_Context = ed::CreateEditor(&config);
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -110,6 +118,7 @@ int main(int, char**)
     float s4 = 0.2f;
     float distortion = 1.0f;
     bool use3d = false;
+    bool showEditor = false;
 
     #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -151,9 +160,9 @@ int main(int, char**)
         ImGui::NewFrame();
 
         ImGui::Begin("Settings");
-
         //ImGui::SliderFloat("speed", &speed, -10.0f, 10.0f);
         ImGui::Checkbox("3d", &use3d);
+        ImGui::Checkbox("Editor", &showEditor);
         ImGui::SliderFloat("s1", &s1, 0.0f, 1.0f);
         ImGui::SliderFloat("s2", &s2, 0.0f, 1.0f);
         ImGui::SliderFloat("s3", &s3, 0.0f, 1.0f);
@@ -162,6 +171,25 @@ int main(int, char**)
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
         ImGui::End();
+
+        if(showEditor){
+            ed::SetCurrentEditor(m_Context);
+            ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+            int uniqueId = 1;
+            // Start drawing nodes.
+            ed::BeginNode(uniqueId++);
+                ImGui::Text("Node A");
+                ed::BeginPin(uniqueId++, ed::PinKind::Input);
+                    ImGui::Text("-> In");
+                ed::EndPin();
+                ImGui::SameLine();
+                ed::BeginPin(uniqueId++, ed::PinKind::Output);
+                    ImGui::Text("Out ->");
+                ed::EndPin();
+            ed::EndNode();
+            ed::End();
+            ed::SetCurrentEditor(nullptr);
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -176,6 +204,7 @@ int main(int, char**)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+    ed::DestroyEditor(m_Context);
 
     glfwTerminate();
     return 0;
