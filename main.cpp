@@ -10,6 +10,7 @@
 #include"imgui_impl_opengl3.h"
 
 #include "imnodes.h"
+#include <graph.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -65,6 +66,27 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
+
+    Graph graph;
+
+    int id = 0;
+
+    graph.addNode(100, 1);
+    graph.addNode(101, 2);
+    graph.addNode(102, 1);
+    graph.addNode(103, 1);
+
+    graph.addInputAttribute(20, 100, 1);
+    graph.addOutputAttribute(21, 100, 1);
+
+    graph.addInputAttribute(22, 101, 1);
+    graph.addOutputAttribute(23, 101, 1);
+
+    graph.addInputAttribute(24, 102, 1);
+    graph.addOutputAttribute(25, 102, 1);
+
+    graph.addInputAttribute(26, 103, 1);
+    graph.addOutputAttribute(27, 103, 1);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -169,12 +191,15 @@ int main(int, char**)
 
         ImGui::Begin("Editor");
             ImNodes::BeginNodeEditor();
-                ImNodes::BeginNode(1);
-                    ImGui::Text("hello");
-                    ImNodes::BeginInputAttribute(2);
-                    ImNodes::EndInputAttribute();
-                ImNodes::EndNode();
+                graph.draw();
             ImNodes::EndNodeEditor();
+
+            int start_attr, end_attr;
+            if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
+            {
+                std::cout << start_attr << " " << end_attr << "\n";
+                graph.connect(start_attr, end_attr, start_attr+end_attr);
+            }
         ImGui::End();
 
         ImGui::Render();
