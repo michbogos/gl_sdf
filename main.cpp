@@ -9,6 +9,8 @@
 #include"imgui_impl_glfw.h"
 #include"imgui_impl_opengl3.h"
 
+#include "imnodes.h"
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <functional>
@@ -51,6 +53,7 @@ int main(int, char**)
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImNodes::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -164,6 +167,16 @@ int main(int, char**)
 
         ImGui::End();
 
+        ImGui::Begin("Editor");
+            ImNodes::BeginNodeEditor();
+                ImNodes::BeginNode(1);
+                    ImGui::Text("hello");
+                    ImNodes::BeginInputAttribute(2);
+                    ImNodes::EndInputAttribute();
+                ImNodes::EndNode();
+            ImNodes::EndNodeEditor();
+        ImGui::End();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -173,6 +186,9 @@ int main(int, char**)
     #ifdef __EMSCRIPTEN__
     EMSCRIPTEN_MAINLOOP_END;
     #endif
+
+    ImNodes::DestroyContext();
+    ImGui::DestroyContext();
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
